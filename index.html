@@ -191,7 +191,39 @@
       display: flex;
       gap: 14px;
       flex-wrap: wrap;
-      margin-bottom: 60px;
+      margin-bottom: 36px;
+    }
+
+    .hero-sponsor {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-bottom: 56px;
+    }
+
+    .hero-sponsor-label {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.5);
+    }
+
+    .hero-sponsor-chip {
+      display: inline-flex;
+      align-items: center;
+      background: var(--color-pure-white);
+      border-radius: 8px;
+      padding: 9px 18px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.18);
+    }
+
+    .hero-sponsor-img {
+      height: 20px;
+      width: auto;
+      aspect-ratio: 1511 / 156;
+      display: block;
     }
 
     .btn {
@@ -685,6 +717,29 @@
       line-height: 1.2;
     }
 
+    .sponsor-section {
+      background: var(--color-cream-paper);
+      border-bottom: var(--border-frame);
+    }
+
+    .sponsor-logo-card {
+      border: var(--border-frame);
+      background: var(--color-pure-white);
+      margin-top: 40px;
+      padding: 56px 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .sponsor-logo-img {
+      width: 100%;
+      max-width: 420px;
+      height: auto;
+      aspect-ratio: 1511 / 156;
+      display: block;
+    }
+
     footer {
       background: var(--color-primary);
       padding: 60px 40px;
@@ -861,6 +916,9 @@
         align-items: flex-start;
         gap: 6px;
       }
+
+      .sponsor-logo-card { padding: 36px 24px; }
+      .sponsor-logo-img  { max-width: 100%; }
     }
 
     @media (prefers-reduced-motion: reduce) {
@@ -924,6 +982,12 @@
       <div class="hero-ctas">
         <a href="#about" class="btn btn-tangerine">Learn More</a>
         <a href="#team"  class="btn btn-ghost">Meet the Team</a>
+      </div>
+      <div class="hero-sponsor">
+        <span class="hero-sponsor-label">Sponsored By</span>
+        <span class="hero-sponsor-chip">
+          <img src="cyshield-logo-trimmed.png" alt="CYSHIELD" class="hero-sponsor-img" width="1511" height="156">
+        </span>
       </div>
     </div>
 
@@ -1206,6 +1270,21 @@
           <div class="sup-role">Co-Supervisor</div>
           <div class="sup-name">Eng. Selvia<br>Mamdouh</div>
         </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section sponsor-section" aria-labelledby="sponsor-headline">
+    <div class="section-inner">
+      <div class="reveal">
+        <span class="tag">Industry Partner</span>
+        <h2 class="s-headline" id="sponsor-headline">Proudly Sponsored By</h2>
+        <p class="s-body" style="max-width:560px;">
+          Web-Hydra is proudly sponsored by <strong>CYSHIELD</strong> — supporting student-led research in adaptive, AI-driven web application security.
+        </p>
+      </div>
+      <div class="sponsor-logo-card reveal">
+        <img src="cyshield-logo-trimmed.png" alt="CYSHIELD" class="sponsor-logo-img" width="1511" height="156">
       </div>
     </div>
   </section>
