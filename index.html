@@ -1,0 +1,1212 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Web-Hydra — An adaptive WAF combining OWASP CRS with Deep Learning Autoencoders and CNNs for real-time defense against known and zero-day attacks.">
+  <title>Web-Hydra — Adaptive WAF with Machine/Deep Learning</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --color-primary:        #144f53;
+      --color-primary-dark:   #0e3638;
+      --color-primary-light:  #1a6b71;
+      --color-cream-paper:    #f2ebe6;
+      --color-pure-white:     #ffffff;
+      --color-obsidian:       #000000;
+      --color-slate-ink:      #2c2c2c;
+      --color-tangerine:      #ff7701;
+      --color-electric-teal:  #24e3dc;
+      --color-highlighter:    #ffff00;
+      --font-display: 'Playfair Display', Georgia, 'Times New Roman', serif;
+      --font-body:    'Inter', system-ui, -apple-system, sans-serif;
+      --radius-button: 30px;
+      --border-hair:   1px solid #000000;
+      --border-frame:  2px solid #000000;
+      --page-max:      1200px;
+      --section-v:     80px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: var(--font-body);
+      font-size: 16px;
+      line-height: 1.5;
+      color: var(--color-obsidian);
+      background: var(--color-cream-paper);
+      -webkit-font-smoothing: antialiased;
+    }
+
+    img { display: block; max-width: 100%; }
+    a { color: inherit; text-decoration: none; }
+
+    .skip-link {
+      position: absolute;
+      top: -999px;
+      left: 8px;
+      background: var(--color-tangerine);
+      color: white;
+      padding: 8px 16px;
+      font-weight: 700;
+      border-radius: var(--radius-button);
+      z-index: 9999;
+    }
+    .skip-link:focus { top: 8px; }
+
+    nav {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 100;
+      height: 64px;
+      background: var(--color-primary);
+      border-bottom: var(--border-hair);
+      display: flex;
+      align-items: center;
+      padding: 0 40px;
+      justify-content: space-between;
+    }
+
+    .nav-wordmark {
+      font-family: var(--font-display);
+      font-size: 20px;
+      font-weight: 700;
+      color: white;
+      letter-spacing: -0.02em;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .nav-links {
+      display: flex;
+      gap: 32px;
+      list-style: none;
+    }
+
+    .nav-links a {
+      font-size: 13px;
+      font-weight: 600;
+      color: rgba(255,255,255,0.75);
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      transition: color 150ms;
+      cursor: pointer;
+    }
+
+    .nav-links a:hover,
+    .nav-links a:focus { color: var(--color-electric-teal); outline: none; }
+
+    .hero {
+      min-height: 100vh;
+      background: var(--color-primary);
+      position: relative;
+      overflow: hidden;
+      padding-top: 64px;
+      display: grid;
+      grid-template-rows: 1fr auto;
+    }
+
+    .hero-geo {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      opacity: 0.06;
+      pointer-events: none;
+    }
+
+    .hero-body {
+      position: relative;
+      z-index: 2;
+      max-width: var(--page-max);
+      margin: 0 auto;
+      width: 100%;
+      padding: 80px 40px 40px;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      min-height: calc(100vh - 64px);
+    }
+
+    .hero-badge {
+      display: inline-block;
+      background: var(--color-highlighter);
+      color: #000;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      padding: 5px 14px;
+      margin-bottom: 28px;
+      width: fit-content;
+    }
+
+    .hero-headline {
+      font-family: var(--font-display);
+      font-size: clamp(52px, 7.5vw, 88px);
+      font-weight: 700;
+      line-height: 0.96;
+      letter-spacing: -0.04em;
+      color: white;
+      max-width: 820px;
+      margin-bottom: 28px;
+    }
+
+    .hero-headline .accent { color: var(--color-electric-teal); }
+
+    .hero-tagline {
+      font-family: var(--font-display);
+      font-size: clamp(16px, 2vw, 22px);
+      font-weight: 400;
+      font-style: italic;
+      line-height: 1.45;
+      color: rgba(255,255,255,0.68);
+      max-width: 580px;
+      margin-bottom: 44px;
+    }
+
+    .hero-ctas {
+      display: flex;
+      gap: 14px;
+      flex-wrap: wrap;
+      margin-bottom: 60px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 13px 34px;
+      border-radius: var(--radius-button);
+      font-family: var(--font-body);
+      font-size: 14px;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      cursor: pointer;
+      border: 2px solid transparent;
+      transition: transform 150ms ease, opacity 150ms ease;
+    }
+
+    .btn:hover  { transform: translateY(-2px); }
+    .btn:active { transform: translateY(0); }
+    .btn:focus-visible { outline: 3px solid var(--color-electric-teal); outline-offset: 3px; }
+
+    .btn-tangerine { background: var(--color-tangerine); color: white; }
+
+    .btn-ghost {
+      background: transparent;
+      color: white;
+      border-color: rgba(255,255,255,0.5);
+    }
+    .btn-ghost:hover { border-color: white; }
+
+    .hero-stats {
+      position: absolute;
+      right: 40px;
+      bottom: 80px;
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+      align-items: flex-end;
+    }
+
+    .h-stat-val {
+      font-family: var(--font-display);
+      font-size: 42px;
+      font-weight: 700;
+      color: var(--color-electric-teal);
+      line-height: 1;
+      letter-spacing: -0.03em;
+    }
+
+    .h-stat-label {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.5);
+      margin-top: 2px;
+      text-align: right;
+    }
+
+    .scroll-hint {
+      position: absolute;
+      bottom: 28px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 2;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      opacity: 0.4;
+      animation: bounce 2s infinite;
+    }
+
+    .scroll-hint span {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: white;
+    }
+
+    .scroll-hint svg { color: white; }
+
+    @keyframes bounce {
+      0%, 100% { transform: translateX(-50%) translateY(0); }
+      50%       { transform: translateX(-50%) translateY(6px); }
+    }
+
+    .section { padding: var(--section-v) 40px; }
+
+    .section-inner {
+      max-width: var(--page-max);
+      margin: 0 auto;
+    }
+
+    .tag {
+      display: inline-block;
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--color-primary);
+      border: 1px solid var(--color-primary);
+      padding: 4px 12px;
+      margin-bottom: 20px;
+    }
+
+    .s-headline {
+      font-family: var(--font-display);
+      font-size: clamp(28px, 3.5vw, 48px);
+      font-weight: 700;
+      line-height: 1.05;
+      letter-spacing: -0.025em;
+      color: var(--color-primary);
+      margin-bottom: 16px;
+    }
+
+    .s-body {
+      font-size: 17px;
+      line-height: 1.7;
+      color: var(--color-slate-ink);
+    }
+
+    .about-section {
+      background: var(--color-cream-paper);
+      border-top: var(--border-frame);
+      border-bottom: var(--border-frame);
+    }
+
+    .about-grid {
+      display: grid;
+      grid-template-columns: 1fr 380px;
+      gap: 64px;
+      align-items: start;
+    }
+
+    .about-text .s-body p + p { margin-top: 18px; }
+
+    .about-spec-card {
+      border: var(--border-frame);
+      background: white;
+    }
+
+    .spec-card-hdr {
+      padding: 16px 24px;
+      border-bottom: var(--border-hair);
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--color-slate-ink);
+    }
+
+    .spec-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 13px 24px;
+      border-bottom: var(--border-hair);
+      gap: 12px;
+    }
+
+    .spec-row:last-child { border-bottom: none; }
+
+    .spec-k {
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--color-slate-ink);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      flex-shrink: 0;
+    }
+
+    .spec-v {
+      font-family: var(--font-display);
+      font-size: 14px;
+      color: var(--color-primary);
+      text-align: right;
+    }
+
+    .stats-band {
+      background: var(--color-primary);
+      padding: 64px 40px;
+      border-top: var(--border-frame);
+      border-bottom: var(--border-frame);
+    }
+
+    .stats-grid {
+      max-width: var(--page-max);
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1px;
+      background: rgba(255,255,255,0.12);
+    }
+
+    .stat-block {
+      background: var(--color-primary);
+      padding: 48px 32px;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 20px;
+    }
+
+    .stat-ring-wrap {
+      position: relative;
+      width: 130px;
+      height: 130px;
+    }
+
+    .stat-ring-wrap svg {
+      transform: rotate(-90deg);
+      width: 130px;
+      height: 130px;
+    }
+
+    .stat-ring-num {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-display);
+      font-size: 24px;
+      font-weight: 700;
+      color: white;
+    }
+
+    .stat-title {
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.65);
+    }
+
+    .stat-note {
+      font-size: 12px;
+      color: rgba(255,255,255,0.35);
+      margin-top: -12px;
+    }
+
+    .meth-section {
+      background: var(--color-cream-paper);
+      border-bottom: var(--border-frame);
+    }
+
+    .meth-intro {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 64px;
+      align-items: end;
+      margin-bottom: 48px;
+    }
+
+    .meth-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      border: var(--border-frame);
+    }
+
+    .meth-card {
+      padding: 32px 28px;
+      border-right: var(--border-hair);
+      border-bottom: var(--border-hair);
+      background: white;
+      transition: background 180ms;
+    }
+
+    .meth-card:hover { background: #f8f4f0; }
+    .meth-card:nth-child(3n)   { border-right: none; }
+    .meth-card:nth-last-child(-n+3) { border-bottom: none; }
+
+    .meth-num {
+      font-family: var(--font-display);
+      font-size: 52px;
+      font-weight: 700;
+      line-height: 1;
+      color: var(--color-primary);
+      opacity: 0.18;
+      margin-bottom: 14px;
+    }
+
+    .meth-title {
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--color-obsidian);
+      margin-bottom: 10px;
+    }
+
+    .meth-desc {
+      font-size: 14px;
+      line-height: 1.65;
+      color: var(--color-slate-ink);
+    }
+
+    .comparison-section {
+      background: white;
+      border-bottom: var(--border-frame);
+    }
+
+    .chart-table {
+      margin-top: 40px;
+      border: var(--border-frame);
+    }
+
+    .chart-row {
+      display: grid;
+      grid-template-columns: 220px 1fr 72px;
+      align-items: center;
+      border-bottom: var(--border-hair);
+    }
+
+    .chart-row:last-child { border-bottom: none; }
+    .chart-row.header { background: var(--color-primary); }
+
+    .chart-row.header .chart-label,
+    .chart-row.header .chart-pct {
+      color: white;
+      font-weight: 700;
+    }
+
+    .chart-label {
+      padding: 14px 20px;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--color-slate-ink);
+      border-right: var(--border-hair);
+      white-space: nowrap;
+    }
+
+    .chart-bar-wrap {
+      padding: 14px 16px;
+      border-right: var(--border-hair);
+    }
+
+    .chart-bar-track {
+      height: 20px;
+      background: #f0ede9;
+    }
+
+    .chart-bar-fill {
+      height: 100%;
+      background: var(--color-primary);
+      transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .chart-row.highlight .chart-bar-fill { background: var(--color-electric-teal); }
+    .chart-row.highlight .chart-label { color: var(--color-primary); font-weight: 700; }
+
+    .chart-pct {
+      padding: 14px 16px;
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--color-primary);
+      text-align: right;
+      font-variant-numeric: tabular-nums;
+    }
+
+    .team-section {
+      background: var(--color-cream-paper);
+      border-bottom: var(--border-frame);
+    }
+
+    .team-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      border: var(--border-frame);
+      margin-top: 48px;
+    }
+
+    .team-card {
+      padding: 32px 20px;
+      text-align: center;
+      border-right: var(--border-hair);
+      background: white;
+      transition: background 180ms;
+    }
+
+    .team-card:last-child { border-right: none; }
+    .team-card:hover { background: var(--color-cream-paper); }
+
+    .team-avatar {
+      width: 76px;
+      height: 76px;
+      border-radius: 50%;
+      background: var(--color-primary);
+      border: var(--border-frame);
+      color: white;
+      font-family: var(--font-display);
+      font-size: 22px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0 auto 18px;
+    }
+
+    .team-name {
+      font-family: var(--font-display);
+      font-size: 15px;
+      font-weight: 700;
+      color: var(--color-obsidian);
+      line-height: 1.2;
+      margin-bottom: 6px;
+    }
+
+    .team-role {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--color-primary);
+    }
+
+    a.team-card {
+      display: block;
+      text-decoration: none;
+      color: inherit;
+      cursor: pointer;
+      position: relative;
+    }
+
+    .team-li-icon {
+      width: 20px;
+      height: 20px;
+      margin: 10px auto 0;
+      color: var(--color-primary);
+      opacity: 0;
+      transition: opacity 150ms ease, transform 150ms ease;
+      transform: translateY(4px);
+      display: block;
+    }
+
+    a.team-card:hover .team-li-icon,
+    a.team-card:focus-visible .team-li-icon {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    a.team-card:hover .team-avatar {
+      background: var(--color-primary-light);
+      border-color: var(--color-electric-teal);
+      transition: background 180ms, border-color 180ms;
+    }
+
+    a.team-card:focus-visible {
+      outline: 3px solid var(--color-electric-teal);
+      outline-offset: -3px;
+    }
+
+    .supervision-section {
+      background: white;
+      border-bottom: var(--border-frame);
+    }
+
+    .sup-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      border: var(--border-frame);
+      margin-top: 40px;
+      max-width: 640px;
+    }
+
+    .sup-card {
+      padding: 32px 28px;
+      border-right: var(--border-hair);
+    }
+
+    .sup-card:last-child { border-right: none; }
+
+    .sup-role {
+      font-size: 11px;
+      font-weight: 700;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--color-primary);
+      margin-bottom: 8px;
+    }
+
+    .sup-name {
+      font-family: var(--font-display);
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--color-obsidian);
+      line-height: 1.2;
+    }
+
+    footer {
+      background: var(--color-primary);
+      padding: 60px 40px;
+      border-top: var(--border-frame);
+    }
+
+    .footer-inner {
+      max-width: var(--page-max);
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 64px;
+      align-items: end;
+    }
+
+    .footer-wordmark {
+      font-family: var(--font-display);
+      font-size: 36px;
+      font-weight: 700;
+      color: white;
+      letter-spacing: -0.03em;
+      line-height: 1;
+      margin-bottom: 10px;
+    }
+
+    .footer-sub {
+      font-size: 14px;
+      color: rgba(255,255,255,0.5);
+      line-height: 1.7;
+      margin-bottom: 28px;
+    }
+
+    .footer-right { text-align: right; }
+
+    .footer-right p {
+      font-size: 13px;
+      color: rgba(255,255,255,0.5);
+      line-height: 1.9;
+    }
+
+    .footer-right strong { color: var(--color-electric-teal); }
+
+    .sponsor-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-top: 20px;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.2);
+      padding: 9px 22px;
+      border-radius: var(--radius-button);
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.75);
+    }
+
+    .nav-logo-img {
+      height: 34px;
+      width: auto;
+      filter: brightness(0) invert(1);
+      flex-shrink: 0;
+      display: block;
+    }
+
+    .hero-logo-img {
+      height: 110px;
+      width: auto;
+      filter: brightness(0) invert(1);
+      margin-bottom: 36px;
+      display: block;
+    }
+
+    .reveal {
+      opacity: 0;
+      transform: translateY(22px);
+      transition: opacity 550ms ease, transform 550ms ease;
+    }
+
+    .reveal.visible {
+      opacity: 1;
+      transform: none;
+    }
+
+    @media (max-width: 1024px) {
+      .about-grid      { grid-template-columns: 1fr; }
+      .about-spec-card { max-width: 480px; }
+      .meth-intro      { grid-template-columns: 1fr; gap: 24px; }
+    }
+
+    @media (max-width: 768px) {
+      :root { --section-v: 56px; }
+
+      nav { padding: 0 20px; }
+      .nav-links { display: none; }
+
+      .hero-body  { padding: 60px 20px 120px; }
+      .hero-stats { right: 20px; bottom: 24px; }
+
+      .h-stat-val   { font-size: 30px; }
+      .h-stat-label { font-size: 10px; }
+
+      .section { padding: var(--section-v) 20px; }
+
+      .stats-grid { grid-template-columns: 1fr; }
+
+      .meth-grid { grid-template-columns: 1fr; }
+      .meth-card { border-right: none; }
+      .meth-card:nth-last-child(-n+3) { border-bottom: var(--border-hair); }
+      .meth-card:last-child { border-bottom: none; }
+
+      .chart-row   { grid-template-columns: 140px 1fr 60px; }
+      .chart-label { font-size: 12px; padding: 12px; }
+
+      .team-grid { grid-template-columns: repeat(2, 1fr); }
+      .team-card:nth-child(2n)  { border-right: none; }
+      .team-card:not(:last-child) { border-bottom: var(--border-hair); }
+
+      .sup-grid { grid-template-columns: 1fr; max-width: 100%; }
+      .sup-card { border-right: none; border-bottom: var(--border-hair); }
+      .sup-card:last-child { border-bottom: none; }
+
+      .footer-inner { grid-template-columns: 1fr; gap: 32px; }
+      .footer-right { text-align: left; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .reveal { transition: none; }
+      .btn    { transition: none; }
+      @keyframes bounce { from, to { transform: translateX(-50%); } }
+    }
+  </style>
+</head>
+<body>
+  <a href="#main" class="skip-link">Skip to content</a>
+
+  <nav aria-label="Primary navigation">
+    <a href="#" class="nav-wordmark" aria-label="Web-Hydra home">
+      <img src="logo.png" alt="" class="nav-logo-img" aria-hidden="true">
+      Web-Hydra
+    </a>
+    <ul class="nav-links" role="list">
+      <li><a href="#about">About</a></li>
+      <li><a href="#methodology">Methodology</a></li>
+      <li><a href="#results">Results</a></li>
+      <li><a href="#team">Team</a></li>
+    </ul>
+  </nav>
+
+  <section class="hero" aria-labelledby="hero-headline">
+    <svg class="hero-geo" viewBox="0 0 1440 900" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <circle cx="1100" cy="180" r="320" stroke="white" stroke-width="1"/>
+      <circle cx="1100" cy="180" r="220" stroke="white" stroke-width="0.8"/>
+      <circle cx="1100" cy="180" r="120" stroke="white" stroke-width="0.6"/>
+      <line x1="0" y1="150" x2="1440" y2="150" stroke="white" stroke-width="0.4"/>
+      <line x1="0" y1="400" x2="1440" y2="400" stroke="white" stroke-width="0.4"/>
+      <line x1="0" y1="650" x2="1440" y2="650" stroke="white" stroke-width="0.4"/>
+      <line x1="200" y1="0" x2="200" y2="900" stroke="white" stroke-width="0.4"/>
+      <line x1="500" y1="0" x2="500" y2="900" stroke="white" stroke-width="0.4"/>
+      <polygon points="680,250 730,278 730,334 680,362 630,334 630,278" stroke="white" stroke-width="0.8" fill="none"/>
+      <polygon points="730,278 780,306 780,362 730,390 680,362 680,306" stroke="white" stroke-width="0.5" fill="none"/>
+      <polygon points="630,278 680,306 680,362 630,390 580,362 580,306" stroke="white" stroke-width="0.5" fill="none"/>
+      <line x1="0" y1="900" x2="400" y2="0" stroke="white" stroke-width="0.4"/>
+    </svg>
+
+    <div class="hero-body" id="main">
+      <img src="logo.png" alt="Web-Hydra logo" class="hero-logo-img">
+      <span class="hero-badge">MIU · Faculty of Computer Science · 2025/2026</span>
+      <h1 class="hero-headline" id="hero-headline">
+        Adaptive<br>
+        <span class="accent">WAF</span> with<br>
+        Machine Learning
+      </h1>
+      <p class="hero-tagline">
+        A defense-in-depth Web Application Firewall combining OWASP CRS with Deep Learning Autoencoders and CNNs — stopping known and zero-day attacks in real time.
+      </p>
+      <div class="hero-ctas">
+        <a href="#about" class="btn btn-tangerine">Learn More</a>
+        <a href="#team"  class="btn btn-ghost">Meet the Team</a>
+      </div>
+    </div>
+
+    <aside class="hero-stats" aria-label="Key metrics">
+      <div>
+        <div class="h-stat-val">87.4%</div>
+        <div class="h-stat-label">Balanced Accuracy</div>
+      </div>
+      <div>
+        <div class="h-stat-val">90.9%</div>
+        <div class="h-stat-label">Detection Quality</div>
+      </div>
+      <div>
+        <div class="h-stat-val">83.9%</div>
+        <div class="h-stat-label">Security Quality</div>
+      </div>
+    </aside>
+
+    <div class="scroll-hint" aria-hidden="true">
+      <span>Scroll</span>
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="6 9 12 15 18 9"/>
+      </svg>
+    </div>
+  </section>
+
+  <section id="about" class="section about-section" aria-labelledby="about-headline">
+    <div class="section-inner">
+      <div class="about-grid">
+        <div class="about-text reveal">
+          <span class="tag">Abstract</span>
+          <h2 class="s-headline" id="about-headline">
+            Intelligent Protection<br>Beyond Signatures
+          </h2>
+          <div class="s-body">
+            <p>Traditional WAFs rely on static regex rules — effective against known attack patterns, but fundamentally blind to evolving zero-day threats. OWASP Top 10 vulnerabilities continue to cause major security incidents, while signature-based defenses are routinely bypassed by attackers who understand the playbook.</p>
+            <p>Web-Hydra introduces a <strong>9-Layer Architecture</strong> that fuses OWASP CRS signature matching with deep learning-based anomaly detection. Deep Learning Autoencoders learn the statistical profile of normal traffic; CNNs classify threat types with precision. Together they stop the attacks that no rule has ever described.</p>
+            <p>Deployed as a containerized reverse-proxy, Web-Hydra operates transparently between client and application — delivering immediate, intelligent, and unforgiving protection without modifying existing infrastructure.</p>
+          </div>
+        </div>
+        <div class="about-spec-card reveal">
+          <div class="spec-card-hdr">System Specification</div>
+          <div class="spec-row">
+            <span class="spec-k">Architecture</span>
+            <span class="spec-v">9-Layer Pipeline</span>
+          </div>
+          <div class="spec-row">
+            <span class="spec-k">AI Models</span>
+            <span class="spec-v">Autoencoder + CNN</span>
+          </div>
+          <div class="spec-row">
+            <span class="spec-k">Rule Engine</span>
+            <span class="spec-v">OWASP CRS</span>
+          </div>
+          <div class="spec-row">
+            <span class="spec-k">Deployment</span>
+            <span class="spec-v">Docker (Reverse Proxy)</span>
+          </div>
+          <div class="spec-row">
+            <span class="spec-k">Coverage</span>
+            <span class="spec-v">OWASP Top 10 + Zero-Day</span>
+          </div>
+          <div class="spec-row">
+            <span class="spec-k">Processing</span>
+            <span class="spec-v">Real-Time Inference</span>
+          </div>
+          <div class="spec-row">
+            <span class="spec-k">Institution</span>
+            <span class="spec-v">MIU Egypt</span>
+          </div>
+          <div class="spec-row">
+            <span class="spec-k">Sponsor</span>
+            <span class="spec-v">CYSHIELD</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="stats-band" role="region" aria-label="Performance metrics">
+    <div class="stats-grid">
+      <div class="stat-block reveal">
+        <div class="stat-ring-wrap">
+          <svg viewBox="0 0 130 130" aria-hidden="true">
+            <circle cx="65" cy="65" r="55" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="9"/>
+            <circle cx="65" cy="65" r="55" fill="none" stroke="#24e3dc" stroke-width="9"
+              stroke-dasharray="345.4" stroke-dashoffset="43.7" stroke-linecap="round"/>
+          </svg>
+          <div class="stat-ring-num" aria-label="87.4 percent">87.4%</div>
+        </div>
+        <div class="stat-title">Balanced Accuracy</div>
+        <div class="stat-note">Runner-up: F5 BIG-IP at 88%</div>
+      </div>
+      <div class="stat-block reveal">
+        <div class="stat-ring-wrap">
+          <svg viewBox="0 0 130 130" aria-hidden="true">
+            <circle cx="65" cy="65" r="55" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="9"/>
+            <circle cx="65" cy="65" r="55" fill="none" stroke="#ff7701" stroke-width="9"
+              stroke-dasharray="345.4" stroke-dashoffset="31.4" stroke-linecap="round"/>
+          </svg>
+          <div class="stat-ring-num" aria-label="90.9 percent">90.9%</div>
+        </div>
+        <div class="stat-title">Detection Quality</div>
+        <div class="stat-note">True Negative Rate (TNR)</div>
+      </div>
+      <div class="stat-block reveal">
+        <div class="stat-ring-wrap">
+          <svg viewBox="0 0 130 130" aria-hidden="true">
+            <circle cx="65" cy="65" r="55" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="9"/>
+            <circle cx="65" cy="65" r="55" fill="none" stroke="#ffff00" stroke-width="9"
+              stroke-dasharray="345.4" stroke-dashoffset="55.7" stroke-linecap="round"/>
+          </svg>
+          <div class="stat-ring-num" aria-label="83.9 percent">83.9%</div>
+        </div>
+        <div class="stat-title">Security Quality</div>
+        <div class="stat-note">True Positive Rate (TPR)</div>
+      </div>
+    </div>
+  </div>
+
+  <section id="methodology" class="section meth-section" aria-labelledby="meth-headline">
+    <div class="section-inner">
+      <div class="meth-intro">
+        <div class="reveal">
+          <span class="tag">Methodology</span>
+          <h2 class="s-headline" id="meth-headline">9-Layer Defense<br>Architecture</h2>
+        </div>
+        <p class="s-body reveal">
+          A compartmentalized pipeline processes every HTTP/S request through signature verification, AI anomaly detection, threat intelligence, and unified risk scoring — before a final allow or block decision is enforced.
+        </p>
+      </div>
+      <div class="meth-grid" role="list">
+        <article class="meth-card reveal" role="listitem">
+          <div class="meth-num" aria-hidden="true">01</div>
+          <h3 class="meth-title">Request Interception</h3>
+          <p class="meth-desc">All incoming HTTP/S traffic is captured at the traffic layer before reaching the upstream application — zero-trust from the first byte.</p>
+        </article>
+        <article class="meth-card reveal" role="listitem">
+          <div class="meth-num" aria-hidden="true">02</div>
+          <h3 class="meth-title">Decode &amp; Normalize</h3>
+          <p class="meth-desc">URL decoding, header normalization, and payload unpacking transform obfuscated input into a canonical form ready for analysis.</p>
+        </article>
+        <article class="meth-card reveal" role="listitem">
+          <div class="meth-num" aria-hidden="true">03</div>
+          <h3 class="meth-title">Signature Check</h3>
+          <p class="meth-desc">OWASP CRS fingerprint matching against thousands of known attack patterns — SQLi, XSS, RCE, SSRF, path traversal, and more.</p>
+        </article>
+        <article class="meth-card reveal" role="listitem">
+          <div class="meth-num" aria-hidden="true">04</div>
+          <h3 class="meth-title">Feature Extraction</h3>
+          <p class="meth-desc">Key attributes, n-gram vectors, and statistical features are extracted from request parameters, headers, and body content.</p>
+        </article>
+        <article class="meth-card reveal" role="listitem">
+          <div class="meth-num" aria-hidden="true">05</div>
+          <h3 class="meth-title">Deep Learning Model</h3>
+          <p class="meth-desc">Autoencoder-based anomaly detection identifies statistical deviations from learned normal traffic — catching zero-day attacks without any signature.</p>
+        </article>
+        <article class="meth-card reveal" role="listitem">
+          <div class="meth-num" aria-hidden="true">06</div>
+          <h3 class="meth-title">Classification Model</h3>
+          <p class="meth-desc">A CNN classifier assigns attack-type labels and confidence scores to flagged requests for precise, explainable threat categorization.</p>
+        </article>
+        <article class="meth-card reveal" role="listitem">
+          <div class="meth-num" aria-hidden="true">07</div>
+          <h3 class="meth-title">Threat Intelligence</h3>
+          <p class="meth-desc">Real-time IP/domain reputation lookup enriches each request with external threat-intel context to surface attacker origin and history.</p>
+        </article>
+        <article class="meth-card reveal" role="listitem">
+          <div class="meth-num" aria-hidden="true">08</div>
+          <h3 class="meth-title">Risk Scoring &amp; Policy</h3>
+          <p class="meth-desc">A unified scoring engine aggregates all signals into a single risk score, enforcing configurable allow/block thresholds per policy.</p>
+        </article>
+        <article class="meth-card reveal" role="listitem">
+          <div class="meth-num" aria-hidden="true">09</div>
+          <h3 class="meth-title">Log &amp; Dashboard</h3>
+          <p class="meth-desc">Every decision is logged with full context. A real-time dashboard surfaces attack trends, behavioral profiles, CVE matches, and patch recommendations.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section id="results" class="section comparison-section" aria-labelledby="results-headline">
+    <div class="section-inner">
+      <div class="reveal">
+        <span class="tag">Results</span>
+        <h2 class="s-headline" id="results-headline">Benchmark Comparison</h2>
+        <p class="s-body" style="max-width:560px; margin-bottom:0;">
+          Balanced Accuracy against commercial and open-source WAF solutions evaluated on the same dataset.
+        </p>
+      </div>
+      <div class="chart-table reveal" role="table" aria-label="WAF balanced accuracy comparison">
+        <div class="chart-row header" role="row">
+          <div class="chart-label" role="columnheader">Solution</div>
+          <div class="chart-bar-wrap" role="columnheader" style="font-size:13px;font-weight:700;color:white;border-right:1px solid rgba(255,255,255,0.2);">Balanced Accuracy</div>
+          <div class="chart-pct" role="columnheader" style="color:white;">Score</div>
+        </div>
+        <div class="chart-row" role="row">
+          <div class="chart-label" role="cell">F5 BIG-IP Advanced WAF</div>
+          <div class="chart-bar-wrap" role="cell"><div class="chart-bar-track"><div class="chart-bar-fill js-bar" data-pct="88" style="width:0%"></div></div></div>
+          <div class="chart-pct" role="cell">88.0%</div>
+        </div>
+        <div class="chart-row highlight" role="row" aria-label="Web-Hydra — our system">
+          <div class="chart-label" role="cell">Web-Hydra ★</div>
+          <div class="chart-bar-wrap" role="cell"><div class="chart-bar-track"><div class="chart-bar-fill js-bar" data-pct="87.4" style="width:0%"></div></div></div>
+          <div class="chart-pct" role="cell">87.4%</div>
+        </div>
+        <div class="chart-row" role="row">
+          <div class="chart-label" role="cell">AWS WAF + F5</div>
+          <div class="chart-bar-wrap" role="cell"><div class="chart-bar-track"><div class="chart-bar-fill js-bar" data-pct="87.1" style="width:0%"></div></div></div>
+          <div class="chart-pct" role="cell">87.1%</div>
+        </div>
+        <div class="chart-row" role="row">
+          <div class="chart-label" role="cell">AWS WAF</div>
+          <div class="chart-bar-wrap" role="cell"><div class="chart-bar-track"><div class="chart-bar-fill js-bar" data-pct="86.9" style="width:0%"></div></div></div>
+          <div class="chart-pct" role="cell">86.9%</div>
+        </div>
+        <div class="chart-row" role="row">
+          <div class="chart-label" role="cell">NGINX ModSecurity</div>
+          <div class="chart-bar-wrap" role="cell"><div class="chart-bar-track"><div class="chart-bar-fill js-bar" data-pct="86.2" style="width:0%"></div></div></div>
+          <div class="chart-pct" role="cell">86.2%</div>
+        </div>
+      </div>
+      <p style="font-size:12px;color:var(--color-slate-ink);margin-top:12px;opacity:0.6;">Bar width normalized to 80–90% range for readability.</p>
+    </div>
+  </section>
+
+  <section id="team" class="section team-section" aria-labelledby="team-headline">
+    <div class="section-inner">
+      <div class="reveal">
+        <span class="tag">The Team</span>
+        <h2 class="s-headline" id="team-headline">Built by Five</h2>
+      </div>
+      <div class="team-grid" role="list">
+        <a class="team-card reveal" role="listitem" href="https://www.linkedin.com/in/zsamy/" target="_blank" rel="noopener noreferrer" aria-label="Ziad Samy on LinkedIn">
+          <div class="team-avatar" aria-hidden="true">ZS</div>
+          <div class="team-name">Ziad Samy</div>
+          <div class="team-role">Team Member</div>
+          <svg class="team-li-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+        </a>
+        <a class="team-card reveal" role="listitem" href="https://www.linkedin.com/in/amr-ahmed-sobhy-78465a273/" target="_blank" rel="noopener noreferrer" aria-label="Amr Ahmed on LinkedIn">
+          <div class="team-avatar" aria-hidden="true">AA</div>
+          <div class="team-name">Amr Ahmed</div>
+          <div class="team-role">Team Member</div>
+          <svg class="team-li-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+        </a>
+        <a class="team-card reveal" role="listitem" href="https://www.linkedin.com/in/yousif-younis09/" target="_blank" rel="noopener noreferrer" aria-label="Yousif Ahmed on LinkedIn">
+          <div class="team-avatar" aria-hidden="true">YA</div>
+          <div class="team-name">Yousif Ahmed</div>
+          <div class="team-role">Team Member</div>
+          <svg class="team-li-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+        </a>
+        <a class="team-card reveal" role="listitem" href="https://www.linkedin.com/in/taqi-eldeen-mohammad/" target="_blank" rel="noopener noreferrer" aria-label="Taqi Eldeen Mohamed on LinkedIn">
+          <div class="team-avatar" aria-hidden="true">TE</div>
+          <div class="team-name">Taqi Eldeen<br>Mohamed</div>
+          <div class="team-role">Team Member</div>
+          <svg class="team-li-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+        </a>
+        <a class="team-card reveal" role="listitem" href="https://www.linkedin.com/in/abdelrahman-khalil-13611a312/" target="_blank" rel="noopener noreferrer" aria-label="Abdelrahman Mohamed on LinkedIn">
+          <div class="team-avatar" aria-hidden="true">AM</div>
+          <div class="team-name">Abdelrahman<br>Mohamed</div>
+          <div class="team-role">Team Member</div>
+          <svg class="team-li-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433a2.062 2.062 0 0 1-2.063-2.065 2.064 2.064 0 1 1 2.063 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <section class="section supervision-section" aria-labelledby="sup-headline">
+    <div class="section-inner">
+      <div class="reveal">
+        <span class="tag">Academic Guidance</span>
+        <h2 class="s-headline" id="sup-headline">Supervised By</h2>
+      </div>
+      <div class="sup-grid reveal">
+        <div class="sup-card">
+          <div class="sup-role">Supervisor</div>
+          <div class="sup-name">Dr. Mostafa<br>Abdelrahman</div>
+        </div>
+        <div class="sup-card">
+          <div class="sup-role">Co-Supervisor</div>
+          <div class="sup-name">Eng. Selvia<br>Mamdouh</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="footer-inner">
+      <div>
+        <img src="logo.png" alt="Web-Hydra" style="height:80px;width:auto;filter:brightness(0) invert(1);margin-bottom:16px;display:block;">
+        <div class="footer-wordmark">Web-Hydra</div>
+        <p class="footer-sub">
+          Adaptive WAF with Machine/Deep Learning<br>
+          Faculty of Computer Science · Misr International University · 2025/2026
+        </p>
+        <a href="https://github.com/TaqiEldeen/Web-Hydra" class="btn btn-ghost" target="_blank" rel="noopener noreferrer">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+            <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/>
+          </svg>
+          View on GitHub
+        </a>
+      </div>
+      <div class="footer-right">
+        <p>
+          <strong>Sponsored by</strong><br>
+          CYSHIELD<br><br>
+          Faculty of Computer Science<br>
+          Misr International University<br>
+          Cairo, Egypt · 2025/2026
+        </p>
+        <div class="sponsor-badge">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+          </svg>
+          CYSHIELD Sponsored
+        </div>
+      </div>
+    </div>
+    <div style="max-width:var(--page-max);margin:0 auto;padding:32px 0 0;border-top:1px solid rgba(255,255,255,0.12);margin-top:40px;display:flex;justify-content:space-between;align-items:center;">
+      <p style="font-size:12px;color:rgba(255,255,255,0.3);">© 2026 Web-Hydra Team · MIU Egypt</p>
+      <p style="font-size:12px;color:rgba(255,255,255,0.3);">Defense-in-Depth WAF with AI</p>
+    </div>
+  </footer>
+
+  <script>
+    const revealEls = document.querySelectorAll('.reveal');
+    const revealObserver = new IntersectionObserver(
+      entries => entries.forEach(e => {
+        if (e.isIntersecting) {
+          e.target.classList.add('visible');
+          revealObserver.unobserve(e.target);
+        }
+      }),
+      { threshold: 0.08, rootMargin: '0px 0px -32px 0px' }
+    );
+    revealEls.forEach(el => revealObserver.observe(el));
+
+    const barEls = document.querySelectorAll('.js-bar');
+    const barObserver = new IntersectionObserver(
+      entries => entries.forEach(e => {
+        if (e.isIntersecting) {
+          const pct = parseFloat(e.target.dataset.pct);
+          const normalised = ((pct - 80) / 10) * 100;
+          e.target.style.width = Math.max(0, Math.min(100, normalised)) + '%';
+          barObserver.unobserve(e.target);
+        }
+      }),
+      { threshold: 0.1 }
+    );
+    barEls.forEach(el => barObserver.observe(el));
+
+    document.querySelectorAll('a[href^="#"]').forEach(link => {
+      link.addEventListener('click', e => {
+        const target = document.querySelector(link.getAttribute('href'));
+        if (target) {
+          e.preventDefault();
+          target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      });
+    });
+  </script>
+</body>
+</html>
