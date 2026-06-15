@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <meta name="description" content="Web-Hydra — An adaptive WAF combining OWASP CRS with Deep Learning Autoencoders and CNNs for real-time defense against known and zero-day attacks.">
   <title>Web-Hydra — Adaptive WAF with Machine/Deep Learning</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -43,6 +43,7 @@
 
     img { display: block; max-width: 100%; }
     a { color: inherit; text-decoration: none; }
+    a, button { touch-action: manipulation; }
 
     .skip-link {
       position: absolute;
@@ -66,9 +67,25 @@
       border-bottom: var(--border-hair);
       display: flex;
       align-items: center;
-      padding: 0 40px;
+      padding: 0 max(40px, env(safe-area-inset-right)) 0 max(40px, env(safe-area-inset-left));
       justify-content: space-between;
     }
+
+    .nav-toggle {
+      display: none;
+      width: 44px;
+      height: 44px;
+      align-items: center;
+      justify-content: center;
+      background: transparent;
+      border: none;
+      color: white;
+      cursor: pointer;
+    }
+    .nav-toggle:focus-visible { outline: 3px solid var(--color-electric-teal); outline-offset: 2px; }
+    .nav-toggle .icon-close { display: none; }
+    nav.open .nav-toggle .icon-open  { display: none; }
+    nav.open .nav-toggle .icon-close { display: block; }
 
     .nav-wordmark {
       font-family: var(--font-display);
@@ -102,6 +119,7 @@
 
     .hero {
       min-height: 100vh;
+      min-height: 100dvh;
       background: var(--color-primary);
       position: relative;
       overflow: hidden;
@@ -727,7 +745,8 @@
 
     .nav-logo-img {
       height: 34px;
-      width: auto;
+      width: 34px;
+      aspect-ratio: 1 / 1;
       filter: brightness(0) invert(1);
       flex-shrink: 0;
       display: block;
@@ -735,7 +754,8 @@
 
     .hero-logo-img {
       height: 110px;
-      width: auto;
+      width: 110px;
+      aspect-ratio: 1 / 1;
       filter: brightness(0) invert(1);
       margin-bottom: 36px;
       display: block;
@@ -761,14 +781,56 @@
     @media (max-width: 768px) {
       :root { --section-v: 56px; }
 
-      nav { padding: 0 20px; }
-      .nav-links { display: none; }
+      nav { padding: 0 16px 0 20px; }
+      .nav-toggle { display: inline-flex; }
 
-      .hero-body  { padding: 60px 20px 120px; }
-      .hero-stats { right: 20px; bottom: 24px; }
+      /* Nav links collapse into a dropdown panel toggled by the hamburger */
+      .nav-links {
+        position: fixed;
+        top: 64px; left: 0; right: 0;
+        flex-direction: column;
+        gap: 0;
+        background: var(--color-primary);
+        border-bottom: var(--border-hair);
+        padding: 6px 0 calc(6px + env(safe-area-inset-bottom));
+        transform: translateY(-12px);
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 180ms ease, transform 180ms ease;
+      }
+      nav.open .nav-links {
+        opacity: 1;
+        transform: none;
+        pointer-events: auto;
+      }
+      .nav-links a {
+        display: block;
+        padding: 15px 24px;
+        font-size: 14px;
+        color: white;
+      }
 
-      .h-stat-val   { font-size: 30px; }
-      .h-stat-label { font-size: 10px; }
+      /* Hero: stack in normal flow, stats inline below content (no overlap) */
+      .hero        { display: block; }
+      .hero-body   {
+        min-height: auto;
+        justify-content: flex-start;
+        padding: 48px 20px 28px;
+      }
+      .hero-headline { font-size: clamp(40px, 11vw, 60px); }
+
+      .hero-stats {
+        position: static;
+        flex-direction: row;
+        flex-wrap: wrap;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 16px 12px;
+        padding: 0 20px calc(48px + env(safe-area-inset-bottom));
+      }
+      .h-stat-val   { font-size: 28px; }
+      .h-stat-label { font-size: 10px; text-align: left; }
+      .scroll-hint  { display: none; }
 
       .section { padding: var(--section-v) 20px; }
 
@@ -779,8 +841,10 @@
       .meth-card:nth-last-child(-n+3) { border-bottom: var(--border-hair); }
       .meth-card:last-child { border-bottom: none; }
 
-      .chart-row   { grid-template-columns: 140px 1fr 60px; }
-      .chart-label { font-size: 12px; padding: 12px; }
+      .chart-row   { grid-template-columns: 110px 1fr 52px; }
+      .chart-label { font-size: 12px; padding: 12px 10px; white-space: normal; line-height: 1.3; }
+      .chart-bar-wrap { padding: 12px 10px; }
+      .chart-pct   { padding: 12px 8px; font-size: 13px; }
 
       .team-grid { grid-template-columns: repeat(2, 1fr); }
       .team-card:nth-child(2n)  { border-right: none; }
@@ -792,6 +856,11 @@
 
       .footer-inner { grid-template-columns: 1fr; gap: 32px; }
       .footer-right { text-align: left; }
+      .footer-bottom {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 6px;
+      }
     }
 
     @media (prefers-reduced-motion: reduce) {
@@ -806,15 +875,23 @@
 
   <nav aria-label="Primary navigation">
     <a href="#" class="nav-wordmark" aria-label="Web-Hydra home">
-      <img src="logo.png" alt="" class="nav-logo-img" aria-hidden="true">
+      <img src="logo.png" alt="" class="nav-logo-img" width="34" height="34" aria-hidden="true">
       Web-Hydra
     </a>
-    <ul class="nav-links" role="list">
+    <ul class="nav-links" id="primary-nav-links" role="list">
       <li><a href="#about">About</a></li>
       <li><a href="#methodology">Methodology</a></li>
       <li><a href="#results">Results</a></li>
       <li><a href="#team">Team</a></li>
     </ul>
+    <button class="nav-toggle" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="primary-nav-links">
+      <svg class="icon-open" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+        <line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/>
+      </svg>
+      <svg class="icon-close" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true">
+        <line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/>
+      </svg>
+    </button>
   </nav>
 
   <section class="hero" aria-labelledby="hero-headline">
@@ -834,7 +911,7 @@
     </svg>
 
     <div class="hero-body" id="main">
-      <img src="logo.png" alt="Web-Hydra logo" class="hero-logo-img">
+      <img src="logo.png" alt="Web-Hydra logo" class="hero-logo-img" width="110" height="110" fetchpriority="high">
       <span class="hero-badge">MIU · Faculty of Computer Science · 2025/2026</span>
       <h1 class="hero-headline" id="hero-headline">
         Adaptive<br>
@@ -1136,7 +1213,7 @@
   <footer>
     <div class="footer-inner">
       <div>
-        <img src="logo.png" alt="Web-Hydra" style="height:80px;width:auto;filter:brightness(0) invert(1);margin-bottom:16px;display:block;">
+        <img src="logo.png" alt="Web-Hydra" width="80" height="80" loading="lazy" style="height:80px;width:80px;aspect-ratio:1/1;filter:brightness(0) invert(1);margin-bottom:16px;display:block;">
         <div class="footer-wordmark">Web-Hydra</div>
         <p class="footer-sub">
           Adaptive WAF with Machine/Deep Learning<br>
@@ -1165,7 +1242,7 @@
         </div>
       </div>
     </div>
-    <div style="max-width:var(--page-max);margin:0 auto;padding:32px 0 0;border-top:1px solid rgba(255,255,255,0.12);margin-top:40px;display:flex;justify-content:space-between;align-items:center;">
+    <div class="footer-bottom" style="max-width:var(--page-max);margin:0 auto;padding:32px 0 0;border-top:1px solid rgba(255,255,255,0.12);margin-top:40px;display:flex;justify-content:space-between;align-items:center;gap:8px;">
       <p style="font-size:12px;color:rgba(255,255,255,0.3);">© 2026 Web-Hydra Team · MIU Egypt</p>
       <p style="font-size:12px;color:rgba(255,255,255,0.3);">Defense-in-Depth WAF with AI</p>
     </div>
@@ -1206,6 +1283,25 @@
           target.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
       });
+    });
+
+    // Mobile navigation toggle
+    const navEl = document.querySelector('nav');
+    const navToggle = document.querySelector('.nav-toggle');
+    const setMenu = open => {
+      navEl.classList.toggle('open', open);
+      navToggle.setAttribute('aria-expanded', String(open));
+      navToggle.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
+    };
+    navToggle.addEventListener('click', () => setMenu(!navEl.classList.contains('open')));
+    navEl.querySelectorAll('.nav-links a').forEach(a =>
+      a.addEventListener('click', () => setMenu(false))
+    );
+    document.addEventListener('keydown', e => {
+      if (e.key === 'Escape' && navEl.classList.contains('open')) {
+        setMenu(false);
+        navToggle.focus();
+      }
     });
   </script>
 </body>
