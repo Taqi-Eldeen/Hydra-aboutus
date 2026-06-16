@@ -32,6 +32,17 @@
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
     html { scroll-behavior: smooth; }
 
+    /* Discourage text selection / copying */
+    body {
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+      user-select: none;
+      -webkit-touch-callout: none;
+    }
+    /* Keep links keyboard-focusable visuals intact; selection just disabled */
+    img { -webkit-user-drag: none; }
+
     body {
       font-family: var(--font-body);
       font-size: 16px;
@@ -1380,6 +1391,26 @@
       if (e.key === 'Escape' && navEl.classList.contains('open')) {
         setMenu(false);
         navToggle.focus();
+      }
+    });
+
+    // ── Copy deterrents (casual only; not real protection) ──
+    // Block right-click context menu
+    document.addEventListener('contextmenu', e => e.preventDefault());
+    // Block copy / cut / text drag
+    ['copy', 'cut', 'dragstart'].forEach(evt =>
+      document.addEventListener(evt, e => e.preventDefault())
+    );
+    // Block common View-Source / DevTools / Save shortcuts
+    document.addEventListener('keydown', e => {
+      const k = e.key.toLowerCase();
+      if (
+        e.key === 'F12' ||                                  // DevTools
+        (e.ctrlKey && (k === 'u' || k === 's' || k === 'p')) || // View source / Save / Print
+        (e.ctrlKey && k === 'a') ||                         // Select all
+        (e.ctrlKey && e.shiftKey && (k === 'i' || k === 'j' || k === 'c')) // DevTools / inspector
+      ) {
+        e.preventDefault();
       }
     });
   </script>
